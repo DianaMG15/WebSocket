@@ -1,0 +1,40 @@
+Intalacion de Node.js
+descargar el instalador e instaladar
+--> la instalacion es con internet
+
+una vez instalado ir a CMD
+intruducir el siguiente comando, para ver la version del node.js
+>node -v 
+luego para ver la version de npm
+>npm -v
+
+para enpezar a utilizar el node.js
+creamos una carpeta con el nombre de nuestro proyecto
+luego
+creamos el archivo package.json dentro de nuectro proyecto
+---> dentro del package.json escribimos el siguiente codigo.
+{
+	"name": "SokectWeb", //puede ser cualquier nombre (espacio= -)
+	"version": "0.0.1",	//la version de nuestro prototipo
+	"dependencies": { //las dependecias
+		"socket.io": "*", // descargamos las librerias de socket.io * es la ultima version, (puedes poner un version estático)
+		"express": "*", //es necesario la libreria express
+		"log": "*"// y el log.
+	}
+}
+OJO borrar los comentarios del codigo .json
+
+luego.- para instalar dentro del proyecto el npm, vamos a CMD e ingresamos el siguiente comando
+proyecto>npm install
+proyecto>npm init
+
+
+y empezar a programar
+
+una vez terminado a programar 
+
+vamos a CMD 
+proyecto>node server.js
+
+y hacer correr en el navegador
+

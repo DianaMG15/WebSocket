@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Visualizar Video</title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<link rel="stylesheet" type="text/css" href="../css/estilos.css">
+</head>
+<body style="text-align: center; background-image: url('../img/fibra.jpg');" >
+	<p><h2>WEB CAMARA, Receptor</h2></p>
+	<div id="principal" style="background-color: transparent; width: 95%; display: inline-block; text-align: center;">
+
+		<div style="background-color: #808080; height: 80%; width: 50%; display: inline-block; float: left;">
+			<img id="play">
+			<div id="logger"></div>
+
+			<video src="" id="video" style=" width: 40%; height: 50%;" autoplay="true"></video>
+			<canvas id="preview" style="display: none; "></canvas>
+		</div>
+
+
+		<div style=" background-color: #808080; height: 80%; width: 45%; display: inline-block; float: right;">
+			<div id="mensajes_recibidos1" style="background-color: #92928f; width: 95%; height: 450px; text-align:right; padding: 10px;"></div>
+			<br>
+			<form id="frmSocket">
+				<input name="txtMensaje" id="txtMensaje" style="width: 80%; height: 40px;">
+				<input type="submit" name="btnEnviar" value="ENVIAR" style="width: 90px; height: 40px;"><br>
+			</form>
+			<br>
+		</div>
+	</div>
+
+</body>
+
+<script type="text/javascript">
+	// para recibir video
+	var socket=io();
+	socket.on('stream', function(image){
+		var img=document.getElementById("play");
+		img.src=image;
+
+		//$("#logger").text(image); //para ver elnombre de la imagen reproducida
+	})
+
+	/*para mandar video*/
+	var canvas=document.getElementById("preview");
+		var context=canvas.getContext("2d");
+
+		canvas.width=400;
+		canvas.height=300;
+
+		context.width=canvas.width;
+		context.height=canvas.height;
+
+
+		var video=document.getElementById("video");
+
+		//var socket = io();//inicio de IO
+		function logger(msg){
+			$("#logger").text(msg);
+		}
+
+		function loadCam(stream)
+		{
+			video.src=window.URL.createObjectURL(stream);
+			logger('camara cargada correctamente');
+
+		}
+
+		function loadFail()
+		{
+			logger('camara no conectada, por favor conecte');
+		}
+
+		function viewVideo(video, context)
+		{
+			context.drawImage(video,0,0,context.width, context.height);
+			socket.emit('stream',canvas.toDataURL('img/webp')); //para guardar en forma imagen.
+		}
+		$(function(){
+			navigator.getUserMedia=(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msgGetUserMedia);
+
+			if (navigator.getUserMedia) 
+			{
+				navigator.getUserMedia({video:true}, loadCam, loadFail);
+			}
+
+			setInterval(function(){
+				viewVideo(video,context);
+			},10);//500 es la velocidad de transmision
+		});
+
+	//para mandar mensajes
+	var webSocket = io();
+		$(document).on("ready", inicio);
+
+		function inicio(){
+			$("#frmSocket").on("submit", Enviar_Mensaje);
+			webSocket.on("datos_servidor",Recibir_Mensaje );
+		}
+
+		function Enviar_Mensaje(e){
+			e.preventDefault();
+			var dato=$("#frmSocket").find("#txtMensaje").val();
+			webSocket.emit("datos_cliente",dato);
+		}
+
+		function Recibir_Mensaje(data){
+			$("#mensajes_recibidos1").append(data + '<br/>');
+			$("#frmSocket").find("#txtMensaje").val("");
+		}
+</script>
+</html>
